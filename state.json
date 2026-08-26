@@ -1,15 +1,7 @@
 {
- "offset": 466782219,
+ "offset": 466782220,
  "chats": {
   "8587193134": [
-   {
-    "role": "user",
-    "content": "Okay"
-   },
-   {
-    "role": "assistant",
-    "content": "Understood, sir. What task do you need assistance with?"
-   },
    {
     "role": "user",
     "content": "I want to make an agents but I need explanation on how it's works"
@@ -41,6 +33,14 @@
    {
     "role": "assistant",
     "content": "If you\u2019re ready to move forward, I can walk you through building a basic functional Telegram support agent in Botpress step by step as a working example, or tailor instructions to your specific use case. Let me know which you\u2019d prefer."
+   },
+   {
+    "role": "user",
+    "content": "Really"
+   },
+   {
+    "role": "assistant",
+    "content": "Absolutely. Here\u2019s the exact step-by-step to build a basic working Telegram support agent on Botpress in under 30 minutes, no advanced coding required:\n1. Prerequisites first: Get a free Botpress Cloud account, and create a Telegram bot via @BotFather on Telegram to get your bot API token.\n2. Set up the bot base: Log into Botpress, create a new blank bot, select Telegram as your primary channel during setup.\n3. Connect Telegram: Go to the Channels tab in your bot dashboard, paste your BotFather token, send a test message to your new Telegram bot to confirm the connection is live.\n4. Train your NLU: Head to the NLU tab, add core intents for your use case (for a support bot, start with 3: refund_request, order_status, human_handoff). Add 5-10 example phrases for each intent so the system learns to recognize"
    }
   ]
  }
