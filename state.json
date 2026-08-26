@@ -1,15 +1,7 @@
 {
- "offset": 466782220,
+ "offset": 466782221,
  "chats": {
   "8587193134": [
-   {
-    "role": "user",
-    "content": "I want to make an agents but I need explanation on how it's works"
-   },
-   {
-    "role": "assistant",
-    "content": "Agents are autonomous software systems built to complete specific tasks without constant human input, operating on a continuous perceive-reason-act loop:\n1. Perceive: They intake data from their operating environment\u2014this could be user messages, database records, API responses, or any other data relevant to their task.\n2. Reason: They process that input against their pre-defined goals, knowledge base, and decision rules to pick the optimal next step. This can range from simple if-then logic to LLM-powered context analysis for complex, nuanced tasks.\n3. Act: They execute the chosen action, like sending a reply, updating a record, triggering a workflow, or pulling new data.\n4. Repeat: They immediately perceive the result of their action to adjust future steps if needed, closing the loop.\n\nTo build one, you\u2019ll need three core pieces:\n- A clear, specific goal (vague prompts like \"be helpful\" don\u2019t work; \"resolve standard customer refund requests in 2 or fewer responses\" does)\n- Access to relevant data and tools (your company\u2019s policy docs, order system APIs, email sending tools, etc.)\n- A decision framework (rule-based for simple use cases, LLM with strict guardrails for conversational, variable tasks)\n\nFor context, a basic customer support agent works like this: A user messages asking for a refund. The agent perceives the message and the user\u2019s order history, reasons the order is 12 days old (within your 30-day refund window), acts by sending a pre-filled refund link and confirmation, then perceives the user\u2019s reply to either close the ticket or escalate if there\u2019s an issue."
-   },
    {
     "role": "user",
     "content": "Okay"
@@ -41,6 +33,14 @@
    {
     "role": "assistant",
     "content": "Absolutely. Here\u2019s the exact step-by-step to build a basic working Telegram support agent on Botpress in under 30 minutes, no advanced coding required:\n1. Prerequisites first: Get a free Botpress Cloud account, and create a Telegram bot via @BotFather on Telegram to get your bot API token.\n2. Set up the bot base: Log into Botpress, create a new blank bot, select Telegram as your primary channel during setup.\n3. Connect Telegram: Go to the Channels tab in your bot dashboard, paste your BotFather token, send a test message to your new Telegram bot to confirm the connection is live.\n4. Train your NLU: Head to the NLU tab, add core intents for your use case (for a support bot, start with 3: refund_request, order_status, human_handoff). Add 5-10 example phrases for each intent so the system learns to recognize"
+   },
+   {
+    "role": "user",
+    "content": "Okay thanks"
+   },
+   {
+    "role": "assistant",
+    "content": "You\u2019re welcome, sir. If you hit a snag during setup, run into unexpected behavior, or want to expand the bot\u2019s capabilities (like adding LLM reasoning for edge cases, database integrations, etc.), just say the word."
    }
   ]
  }
