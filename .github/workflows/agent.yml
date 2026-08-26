@@ -28,7 +28,7 @@ jobs:
       - name: Run agent
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          DAHL_KEY: ${{ secrets.DAHL_KEY }}
+          NVAPI_KEY: ${{ secrets.NVAPI_KEY }}
         run: python bot.py
 
       - name: Persist conversation state

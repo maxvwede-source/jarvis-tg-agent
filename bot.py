@@ -4,11 +4,11 @@ Stateless-friendly: conversation memory lives in state.json which the workflow c
 import json, os, urllib.request, urllib.error
 
 TG_TOKEN = os.environ["TG_BOT_TOKEN"]
-DAHL_KEY = os.environ.get("DAHL_KEY", "")
+LLM_KEY = os.environ.get("NVAPI_KEY", "")
 STATE_FILE = "state.json"
 API_TG = f"https://api.telegram.org/bot{TG_TOKEN}"
-API_DAHL = "https://inference.dahl.global/v1/chat/completions"
-MODEL = "deepseek-ai/DeepSeek-V4-Flash-0731"
+API_LLM = "https://integrate.api.nvidia.com/v1/chat/completions"
+MODEL = "stepfun-ai/step-3.7-flash"
 MAX_UPDATES_PER_RUN = 20
 
 SYSTEM_PROMPT = (
@@ -20,10 +20,11 @@ SYSTEM_PROMPT = (
 
 def http(url, payload=None):
     data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(url, data=data, headers={
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
-    })
+    headers = {"Content-Type": "application/json"}
+    if "integrate.api.nvidia.com" in url:
+        headers["Authorization"] = "Bearer " + LLM_KEY
+        headers["Accept"] = "application/json"
+    req = urllib.request.Request(url, data=data, headers=headers)
     with urllib.request.urlopen(req, timeout=90) as r:
         return json.loads(r.read())
 
@@ -34,7 +35,7 @@ def tg(method, **params):
         print("tg error:", method, str(e)[:120])
         return {"ok": False}
 
-def ask_dahl(history):
+def ask_llm(history):
     import time as _t
     messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history[-11:]
     payload = {
@@ -42,12 +43,12 @@ def ask_dahl(history):
         "messages": messages,
         "temperature": 0.7,
         "max_tokens": 1200,
-        "chat_template_kwargs": {"enable_thinking": False},
+        "reasoning_effort": "low",
     }
     last_err = None
-    for attempt in range(6):
+    for attempt in range(5):
         try:
-            d = http(API_DAHL, payload)
+            d = http(API_LLM, payload)
             content = (d.get("choices") or [{}])[0].get("message", {}).get("content")
             if not content:
                 raise RuntimeError("empty response: " + json.dumps(d)[:120])
@@ -57,12 +58,12 @@ def ask_dahl(history):
             try: body = e.read().decode()[:80]
             except Exception: pass
             last_err = f"HTTP {e.code} {body}"
-            print(f"dahl attempt {attempt+1} failed: {last_err}")
+            print(f"llm attempt {attempt+1} failed: {last_err}")
         except Exception as e:
             last_err = str(e)[:120]
-            print(f"dahl attempt {attempt+1} failed: {last_err}")
-        _t.sleep(4)
-    raise RuntimeError("Dahl down after 6 tries: " + str(last_err))
+            print(f"llm attempt {attempt+1} failed: {last_err}")
+        _t.sleep(3)
+    raise RuntimeError("LLM down after 5 tries: " + str(last_err))
 
 def load_state():
     if os.path.exists(STATE_FILE):
@@ -104,7 +105,7 @@ def main():
                          "Ask me anything: coding, math, forex calculations, plans, research.")
             else:
                 hist.append({"role": "user", "content": text})
-                reply = ask_dahl(hist)
+                reply = ask_llm(hist)
                 hist.append({"role": "assistant", "content": reply})
                 chats[str(chat_id)] = hist[-10:]
         except Exception as e:
