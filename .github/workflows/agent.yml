@@ -31,6 +31,11 @@ jobs:
           DAHL_KEY: ${{ secrets.DAHL_KEY }}
         run: python bot.py
 
+      - name: Debug Dahl access
+        env:
+          DAHL_KEY: ${{ secrets.DAHL_KEY }}
+        run: python debug.py
+
       - name: Persist conversation state
         run: |
           git config user.name "jarvis-agent"
