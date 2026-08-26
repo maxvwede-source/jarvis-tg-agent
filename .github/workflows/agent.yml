@@ -31,14 +31,20 @@ jobs:
           DAHL_KEY: ${{ secrets.DAHL_KEY }}
         run: python bot.py
 
-      - name: Debug Dahl access
-        env:
-          DAHL_KEY: ${{ secrets.DAHL_KEY }}
-        run: python debug.py
-
       - name: Persist conversation state
         run: |
           git config user.name "jarvis-agent"
           git config user.email "jarvis@agents.local"
           git add state.json
           git diff --cached --quiet || (git commit -m "state sync [skip ci]" && git push)
+      - name: Chain next poll
+        env:
+          REPO_PAT: ${{ secrets.REPO_PAT }}
+        run: |
+          sleep 95
+          curl -s -X POST \
+            -H "Authorization: Bearer $REPO_PAT" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/maxvwede-source/jarvis-tg-agent/actions/workflows/agent.yml/dispatches \
+            -d '{"ref":"master"}' && echo "next poll scheduled"
+

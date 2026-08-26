@@ -35,18 +35,34 @@ def tg(method, **params):
         return {"ok": False}
 
 def ask_dahl(history):
+    import time as _t
     messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history[-11:]
-    d = http(API_DAHL, {
+    payload = {
         "model": MODEL,
         "messages": messages,
         "temperature": 0.7,
         "max_tokens": 1200,
         "chat_template_kwargs": {"enable_thinking": False},
-    })
-    content = (d.get("choices") or [{}])[0].get("message", {}).get("content")
-    if not content:
-        raise RuntimeError("empty model response: " + json.dumps(d)[:150])
-    return content.strip()
+    }
+    last_err = None
+    for attempt in range(6):
+        try:
+            d = http(API_DAHL, payload)
+            content = (d.get("choices") or [{}])[0].get("message", {}).get("content")
+            if not content:
+                raise RuntimeError("empty response: " + json.dumps(d)[:120])
+            return content.strip()
+        except urllib.error.HTTPError as e:
+            body = ""
+            try: body = e.read().decode()[:80]
+            except Exception: pass
+            last_err = f"HTTP {e.code} {body}"
+            print(f"dahl attempt {attempt+1} failed: {last_err}")
+        except Exception as e:
+            last_err = str(e)[:120]
+            print(f"dahl attempt {attempt+1} failed: {last_err}")
+        _t.sleep(4)
+    raise RuntimeError("Dahl down after 6 tries: " + str(last_err))
 
 def load_state():
     if os.path.exists(STATE_FILE):
